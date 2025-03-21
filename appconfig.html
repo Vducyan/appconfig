@@ -212,7 +212,7 @@
         <button class="logout-btn" onclick="logout()">Đăng Xuất</button>
 
         <!-- Các chức năng -->
-        <div class="switch-container" id="fixLagSwitch" style="top: 20px;">
+        <div class="switch-container" id="fixLagSwitch">
             <span>FIX LAG</span>
             <label class="switch">
                 <input type="checkbox" onchange="toggleFunction('fixLag')">
@@ -220,7 +220,7 @@
             </label>
         </div>
 
-        <div class="switch-container" id="fixRungSwitch" style="top: 60px;">
+        <div class="switch-container" id="fixRungSwitch">
             <span>FIX RUNG</span>
             <label class="switch">
                 <input type="checkbox" onchange="toggleFunction('fixRung')">
@@ -228,7 +228,7 @@
             </label>
         </div>
 
-        <div class="switch-container" id="fixDelaySwitch" style="top: 100px;">
+        <div class="switch-container" id="fixDelaySwitch">
             <span>FIX DELAY</span>
             <label class="switch">
                 <input type="checkbox" onchange="toggleFunction('fixDelay')">
@@ -236,7 +236,7 @@
             </label>
         </div>
 
-        <div class="switch-container" id="dpiConfigSwitch" style="top: 140px;">
+        <div class="switch-container" id="dpiConfigSwitch">
             <span>DPI CONFIG</span>
             <label class="switch">
                 <input type="checkbox" id="dpiConfigToggle" onchange="toggleFunction('dpiConfig')">
@@ -247,14 +247,14 @@
         <!-- Nút Download 1 -->
         <div class="download-container">
             <button class="download-btn" id="downloadBtn" onclick="window.location.href='https://www.mediafire.com/file/82x8dtam3wju80v/AIMLOCK_HEX_V2.mobileconfig/file';" style="display: none;">
-                📥 
+                📥 DOWLOAD CONFIG IOS
             </button>
         </div>
 
         <!-- Nút Download 2 -->
         <div class="download-container">
             <button class="download-btn" id="downloadBtn2" onclick="window.location.href='https://www.mediafire.com/file/another-file';" style="display: none;">
-                📥 Download Config 2
+                📥 DOWLOAD CONFIG ADR
             </button>
         </div>
     </div>
@@ -286,21 +286,40 @@
             document.getElementById("toggleSound").play();
         }
 
+        // Lấy địa chỉ IP của người dùng
+        async function getUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('Không thể lấy IP:', error);
+                return null;
+            }
+        }
+
         // Hàm đăng nhập
-        function login() {
+        async function login() {
             let username = document.getElementById("username").value;
             let password = document.getElementById("password").value;
 
             const account = accounts.find(acc => acc.username === username && acc.password === password);
 
             if (account) {
-                playLoginSound();
-                document.getElementById("login-form").style.display = "none";
-                document.getElementById("menu").style.display = "block";
-                document.getElementById("downloadBtn").style.display = "block";
-                document.getElementById("downloadBtn2").style.display = "block"; // Hiển thị nút download thứ 2
+                const userIP = await getUserIP();
+                if (userIP) {
+                    // Kiểm tra nếu IP chưa đăng nhập hoặc trùng với IP đã lưu
+                    if (!account.devices.includes(userIP)) {
+                        account.devices.push(userIP); // Lưu IP mới vào tài khoản
+                    }
+                    playLoginSound();
+                    document.getElementById("login-form").style.display = "none";
+                    document.getElementById("menu").style.display = "block";
+                    document.getElementById("downloadBtn").style.display = "block";
+                    document.getElementById("downloadBtn2").style.display = "block"; // Hiển thị nút download thứ 2
+                }
             } else {
-                showAlert("Sai tài khoản hoặc sai mật khẩu.Vui lòng liên hệ cho ADMIN qua số zalo:0987779469 để mua tài khoản mật khẩu hoặc cấp lại tài khoản mật khẩu!");
+                showAlert("Sai tài khoản hoặc sai mật khẩu. Vui lòng liên hệ ADMIN qua số zalo:0987779469 để mua tài khoản mật khẩu hoặc cấp lại tài khoản mật khẩu!");
             }
         }
 
